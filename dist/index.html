@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>曹冲称象原理演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #f0f8ff;
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: linear-gradient(135deg, #4a90e2, #63b3ed);
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.4;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            height: calc(100vh - 150px);
+        }
+        
+        /* 河流区域样式 */
+        .river-area {
+            flex: 3;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .river-title {
+            font-size: 1.5rem;
+            color: #1e5ea3;
+            margin-bottom: 15px;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #4a90e2;
+        }
+        
+        .river-container {
+            flex: 1;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.08);
+            background-color: #e3f2fd;
+        }
+        
+        /* 白色上半部分 - 可显示水面上方 */
+        .water-above {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%; /* 初始水面在50%处 */
+            background-color: white;
+            z-index: 1;
+            transition: height 1.5s ease;
+        }
+        
+        /* 水面 - 初始在50%位置 */
+        .water-surface {
+            position: absolute;
+            top: 50%; /* 初始水面在50%处 */
+            left: 0;
+            width: 100%;
+            height: 50%; /* 水占据下半部分 */
+            background: linear-gradient(to bottom, #1e88e5, #4fc3f7, #1e88e5);
+            z-index: 2;
+            transition: top 1.5s ease, height 1.5s ease;
+        }
+        
+        /* 初始水面线标记 */
+        .initial-water-line {
+            position: absolute;
+            top: 50%; /* 初始水面线 */
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 3;
+            border-top: 2px dashed rgba(0, 0, 0, 0.5);
+        }
+        
+        .initial-water-line::before {
+            content: '初始水面';
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #333;
+            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 17;
+        }
+        
+        /* 河流波纹效果 */
+        .wave {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="%230097e6"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="%230097e6"/><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="%230097e6"/></svg>');
+            background-size: 1200px 100%;
+            animation: wave 12s linear infinite;
+            opacity: 0.6;
+        }
+        
+        .wave:nth-child(2) {
+            animation-duration: 16s;
+            opacity: 0.4;
+        }
+        
+        .wave:nth-child(3) {
+            animation-duration: 20s;
+            opacity: 0.2;
+        }
+        
+        @keyframes wave {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 1200px; }
+        }
+        
+        /* 船样式 - 初始船底与水面平齐 */
+        .boat-container {
+            position: absolute;
+            top: 30%; /* 船顶位置，船高20%，船底在50%处与水面平齐 */
+            left: 50%;
+            transform: translateX(-50%);
+            transition: top 1.5s ease;
+            z-index: 10;
+            width: 300px;
+            height: 120px;
+        }
+        
+        .boat-img {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.3));
+            position: relative;
+            z-index: 15;
+            object-fit: contain;
+        }
+        
+        /* 船身上的水位线标记 */
+        .boat-water-mark {
+            position: absolute;
+            left: 5%;
+            width: 90%;
+            height: 3px;
+            background-color: red;
+            display: none;
+            z-index: 200;
+            box-shadow: 0 0 5px rgba(255, 0, 0, 0.7);
+        }
+        
+        .boat-water-mark::before {
+            content: '水位线';
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: red;
+            font-weight: bold;
+            background-color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 17;
+        }
+        
+        /* 船体容器，用于放置大象和石头 */
+        .boat-content {
+            position: absolute;
+            top: 8%;
+            left: 10%;
+            width: 80%;
+            height: 60%;
+            z-index: 16;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 大象在船上的样式 */
+        .elephant-on-boat {
+            position: absolute;
+            width: 100px;
+            height: auto;
+            z-index: 13;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+            display: none;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none; /* 防止干扰拖放 */
+        }
+        
+        /* 石头在船上的样式 - 堆叠在船内 */
+        .stones-on-boat {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px; /* 限制石头堆叠区域 */
+            height: 70px; /* 限制石头堆叠区域 */
+            z-index: 12;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none; /* 防止干扰点击 */
+        }
+        
+        .stone-on-boat {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            z-index: 14;
+            pointer-events: auto; /* 允许点击移除 */
+            transform-origin: center center;
+        }
+        
+        .stone-on-boat:hover {
+            transform: scale(1.1);
+        }
+        
+        /* 控制面板样式 */
+        .control-area {
+            flex: 1;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .control-title {
+            font-size: 1.5rem;
+            color: #1e5ea3;
+            margin-bottom: 15px;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #4a90e2;
+        }
+        
+        .elephant-container {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .elephant-img {
+            width: 150px;
+            height: auto;
+            cursor: grab;
+            transition: all 0.3s;
+            margin: 0 auto;
+            display: block;
+            filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
+            user-select: none;
+        }
+        
+        .elephant-img.dragging {
+            opacity: 0.7;
+            transform: scale(0.95);
+            cursor: grabbing;
+        }
+        
+        /* 按钮容器 */
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        .action-button {
+            flex: 1;
+            padding: 10px 6px;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        .action-button:hover {
+            background: linear-gradient(135deg, #66BB6A, #388E3C);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .action-button:active {
+            transform: translateY(1px);
+        }
+        
+        .action-button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .reset-button {
+            background: linear-gradient(135deg, #f44336, #c62828);
+        }
+        
+        .reset-button:hover {
+            background: linear-gradient(135deg, #ef5350, #d32f2f);
+        }
+        
+        .remove-elephant-button {
+            background: linear-gradient(135deg, #FF9800, #EF6C00);
+        }
+        
+        .remove-elephant-button:hover {
+            background: linear-gradient(135deg, #FFB74D, #F57C00);
+        }
+        
+        .counter {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px 0 15px 0;
+            font-size: 1rem;
+            color: #555;
+            background-color: #f5f5f5;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+        
+        .counter-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e5ea3;
+        }
+        
+        .stones-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 5px;
+            border-radius: 8px;
+        }
+        
+        .stones {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 15px;
+            justify-items: center;
+            align-items: center;
+        }
+        
+        .stone {
+            width: 80px;
+            height: 80px;
+            cursor: grab;
+            transition: all 0.3s;
+            user-select: none;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        }
+        
+        .stone.dragging {
+            opacity: 0.7;
+            transform: scale(0.9);
+            cursor: grabbing;
+        }
+        
+        /* 刻度尺 */
+        .scale-container {
+            position: absolute;
+            left: 20px;
+            top: 0;
+            height: 100%;
+            width: 40px;
+            z-index: 5;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .scale-mark {
+            width: 100%;
+            text-align: center;
+            font-size: 11px;
+            color: #333;
+            position: relative;
+            height: 10%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .scale-mark::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            width: 8px;
+            height: 1px;
+            background: #666;
+        }
+        
+        .scale-center {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #666;
+            z-index: 6;
+        }
+        
+        .scale-center::before {
+            content: '初始水面';
+            position: absolute;
+            left: -45px;
+            top: -10px;
+            background: #666;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        
+        /* 标记模式提示 */
+        .marking-hint {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: #e53935;
+            font-weight: bold;
+            z-index: 20;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1100px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .control-area {
+                min-width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.7rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .river-title, .control-title {
+                font-size: 1.3rem;
+            }
+            
+            .elephant-img {
+                width: 130px;
+            }
+            
+            .stone {
+                width: 65px;
+                height: 65px;
+            }
+            
+            .button-row {
+                flex-direction: column;
+                gap: 6px;
+            }
+            
+            .boat-container {
+                width: 250px;
+                height: 100px;
+            }
+            
+            .stones-on-boat {
+                width: 100px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>曹冲称象原理演示</h1>
+        <p class="subtitle">通过互动动画理解等量替换原理 - 拖动大象和石头到船上进行实验</p>
+    </header>
+    
+    <div class="container">
+        <!-- 左侧河流区域 -->
+        <div class="river-area">
+            <h2 class="river-title">河流与船</h2>
+            
+            <div class="river-container" id="river-container">
+                <!-- 刻度尺 -->
+                <div class="scale-container">
+                    <div class="scale-mark">100%</div>
+                    <div class="scale-mark">90%</div>
+                    <div class="scale-mark">80%</div>
+                    <div class="scale-mark">70%</div>
+                    <div class="scale-mark">60%</div>
+                    <div class="scale-mark">50%</div>
+                    <div class="scale-mark">40%</div>
+                    <div class="scale-mark">30%</div>
+                    <div class="scale-mark">20%</div>
+                    <div class="scale-mark">10%</div>
+                    <div class="scale-center"></div>
+                </div>
+                
+                <!-- 标记模式提示 -->
+                <div class="marking-hint" id="marking-hint">点击船身标记水位线</div>
+                
+                <!-- 水面上方部分 -->
+                <div class="water-above" id="water-above"></div>
+                
+                <!-- 初始水面线 -->
+                <div class="initial-water-line"></div>
+                
+                <!-- 蓝色河水部分 -->
+                <div class="water-surface" id="water-surface">
+                    <!-- 河流波纹 -->
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                    <div class="wave"></div>
+                </div>
+                
+                <!-- 船容器 -->
+                <div class="boat-container" id="boat-container">
+                    <!-- 船身上的水位线标记 -->
+                    <div class="boat-water-mark" id="boat-water-mark"></div>
+                    
+                    <!-- 船内容区域，用于放置大象和石头 -->
+                    <div class="boat-content">
+                        <!-- 大象（当放在船上时显示在这里） -->
+                        <img src="elephant.png" alt="大象" class="elephant-on-boat" id="elephant-on-boat">
+                        
+                        <!-- 石头（当放在船上时显示在这里） -->
+                        <div class="stones-on-boat" id="stones-on-boat"></div>
+                    </div>
+                    
+                    <!-- 船图片 -->
+                    <img src="boat.png" alt="船" class="boat-img" id="boat-img">
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧控制面板 -->
+        <div class="control-area">
+            <h2 class="control-title">控制面板</h2>
+            
+            <div class="elephant-container">
+                <img src="elephant.png" alt="大象" class="elephant-img" id="elephant-img" draggable="true">
+                
+                <!-- 三个按钮并排 -->
+                <div class="button-row">
+                    <button class="action-button" id="mark-button" disabled>标记水位线</button>
+                    <button class="action-button remove-elephant-button" id="remove-elephant-button" disabled>移除大象</button>
+                    <button class="action-button reset-button" id="reset-button">重置实验</button>
+                </div>
+            </div>
+            
+            <div class="counter">
+                <div class="counter-value" id="stone-count">0/6</div>
+                <div class="counter-value" id="sink-depth">下沉:0cm</div>
+            </div>
+            
+            <div class="stones-container">
+                <div class="stones" id="stones">
+                    <!-- 石头将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局状态变量
+        let elephantOnBoat = false;
+        let waterMarkAdded = false;
+        let stoneCount = 0;
+        const totalStones = 6; // 总共6块石头
+        let stonesOnBoat = [];
+        let speechEnabled = true;
+        let isMarkingMode = false; // 是否处于标记模式
+        let successAnnounced = false; // 是否已经宣布实验成功
+        
+        // 关键参数（所有计算以百分比为单位）
+        const initialWaterLevel = 50; // 初始水面位置（%）
+        const initialBoatTop = 30; // 船顶初始位置（%），船高20%，船底在50%处与水面平齐
+        const boatHeight = 20; // 船的高度（%）
+        
+        // 下沉参数（模拟5cm下沉）
+        const maxSinkAmount = 5; // 最大下沉5%（模拟5cm）
+        const elephantSinkAmount = maxSinkAmount; // 大象使船下沉5%
+        const stoneSinkAmount = maxSinkAmount / totalStones; // 每块石头使船下沉的幅度
+        
+        // 当前状态
+        let currentWaterLevel = initialWaterLevel; // 当前水面位置
+        let currentBoatTop = initialBoatTop; // 当前船顶位置
+        let currentSinkAmount = 0; // 当前下沉量
+        let waterMarkPosition = 0; // 水位线在船上的位置（从船顶算起的百分比）
+        
+        // DOM元素
+        const elephantImg = document.getElementById('elephant-img');
+        const elephantOnBoatImg = document.getElementById('elephant-on-boat');
+        const boatContainer = document.getElementById('boat-container');
+        const boatWaterMark = document.getElementById('boat-water-mark');
+        const waterSurface = document.getElementById('water-surface');
+        const waterAbove = document.getElementById('water-above');
+        const markButton = document.getElementById('mark-button');
+        const markingHint = document.getElementById('marking-hint');
+        const removeElephantButton = document.getElementById('remove-elephant-button');
+        const resetButton = document.getElementById('reset-button');
+        const riverContainer = document.getElementById('river-container');
+        const stoneCountElement = document.getElementById('stone-count');
+        const sinkDepthElement = document.getElementById('sink-depth');
+        const stonesContainer = document.getElementById('stones');
+        const stonesOnBoatContainer = document.getElementById('stones-on-boat');
+        
+        // 语音提示函数
+        function speak(text) {
+            if (!speechEnabled) return;
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+        
+        // 初始化 - 创建6块石头
+        function createStones() {
+            for (let i = 0; i < totalStones; i++) {
+                const stone = document.createElement('img');
+                stone.className = 'stone';
+                stone.draggable = true;
+                
+                // 交替使用两种石头图片
+                if (i % 2 === 0) {
+                    stone.src = 'stone1.png';
+                    stone.alt = '石头1';
+                } else {
+                    stone.src = 'stone2.png';
+                    stone.alt = '石头2';
+                }
+                
+                stone.dataset.id = `stone-${i}`;
+                stone.dataset.type = i % 2 === 0 ? 'stone1' : 'stone2';
+                stonesContainer.appendChild(stone);
+                
+                addDragEvents(stone, 'stone');
+            }
+        }
+        
+        // 添加拖动事件
+        function addDragEvents(element, type) {
+            element.addEventListener('dragstart', function(e) {
+                this.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', type);
+                e.dataTransfer.setData('id', this.dataset.id || '');
+            });
+            
+            element.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+            });
+        }
+        
+        // 河流区域的拖放事件
+        riverContainer.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+        
+        riverContainer.addEventListener('drop', function(e) {
+            e.preventDefault();
+            const type = e.dataTransfer.getData('text/plain');
+            const id = e.dataTransfer.getData('id');
+            
+            if (type === 'elephant') {
+                if (!elephantOnBoat) {
+                    putElephantOnBoat();
+                }
+            } else if (type === 'stone') {
+                putStoneOnBoat(id);
+            }
+        });
+        
+        // 将大象放到船上
+        function putElephantOnBoat() {
+            // 隐藏右边的大象
+            elephantImg.style.opacity = '0.3';
+            elephantImg.style.cursor = 'default';
+            
+            // 显示船上的大象
+            elephantOnBoatImg.style.display = 'block';
+            elephantOnBoat = true;
+            
+            // 船下沉5cm，水面上升5cm
+            currentSinkAmount = elephantSinkAmount;
+            updateBoatAndWater();
+            
+            speak('大象上船');
+            
+            // 启用标记按钮和移除大象按钮
+            markButton.disabled = false;
+            removeElephantButton.disabled = false;
+            
+            updateCounters();
+        }
+        
+        // 将石头放到船上 - 堆叠在船内
+        function putStoneOnBoat(stoneId) {
+            if (!waterMarkAdded) {
+                speak('请先标记水位线');
+                return;
+            }
+            
+            if (stoneCount >= totalStones) {
+                speak('石头已放满');
+                return;
+            }
+            
+            const stoneElement = document.querySelector(`[data-id="${stoneId}"]`);
+            if (!stoneElement) return;
+            
+            // 如果石头已经在船上，则不再添加
+            if (stonesOnBoat.includes(stoneId)) return;
+            
+            // 隐藏原始石头
+            stoneElement.style.opacity = '0.3';
+            stoneElement.style.cursor = 'default';
+            
+            // 创建船上的石头副本
+            const stoneOnBoat = document.createElement('img');
+            stoneOnBoat.className = 'stone-on-boat';
+            stoneOnBoat.dataset.id = `stone-on-boat-${stoneId}`;
+            stoneOnBoat.dataset.originalId = stoneId;
+            
+            if (stoneElement.dataset.type === 'stone1') {
+                stoneOnBoat.src = 'stone1.png';
+                stoneOnBoat.alt = '石头1';
+            } else {
+                stoneOnBoat.src = 'stone2.png';
+                stoneOnBoat.alt = '石头2';
+            }
+            
+            // 计算石头位置 - 堆叠在船中心
+            // 堆叠效果：每块石头稍微偏移一点位置
+            const centerX = 60; // 船中心的x位置（50%）
+            const centerY = 10; // 船中心的y位置（50%）
+            
+            // 随机偏移，模拟堆叠效果
+            const offsetX = (Math.random() - 0.5) * 20; // -10到+10之间的随机偏移
+            const offsetY = (Math.random() - 0.5) * 0; // -7.5到+7.5之间的随机偏移
+            
+            // 设置石头位置
+            stoneOnBoat.style.left = `${centerX + offsetX}%`;
+            stoneOnBoat.style.top = `${centerY + offsetY}%`;
+            
+            // 设置z-index，后面的石头在上面
+            stoneOnBoat.style.zIndex = 100 + stoneCount;
+            
+            stonesOnBoatContainer.appendChild(stoneOnBoat);
+            stonesOnBoat.push(stoneId);
+            stoneCount++;
+            
+            // 计算新的下沉量
+            currentSinkAmount = stoneCount * stoneSinkAmount;
+            
+            updateBoatAndWater();
+            
+            // 更新状态和语音提示
+            updateStatus();
+            updateCounters();
+            
+            // 添加点击事件从船上移除石头
+            stoneOnBoat.addEventListener('click', function(e) {
+                e.stopPropagation(); // 防止事件冒泡
+                removeStoneFromBoat(stoneId, stoneOnBoat);
+            });
+        }
+        
+        // 从船上移除石头
+        function removeStoneFromBoat(stoneId, stoneElement) {
+            // 重置成功状态
+            successAnnounced = false;
+            
+            // 显示原始石头
+            const originalStone = document.querySelector(`[data-id="${stoneId}"]`);
+            if (originalStone) {
+                originalStone.style.opacity = '1';
+                originalStone.style.cursor = 'grab';
+            }
+            
+            // 从船上移除石头
+            stoneElement.remove();
+            
+            // 从数组中移除
+            const index = stonesOnBoat.indexOf(stoneId);
+            if (index > -1) {
+                stonesOnBoat.splice(index, 1);
+            }
+            
+            stoneCount--;
+            
+            // 计算新的下沉量
+            currentSinkAmount = stoneCount * stoneSinkAmount;
+            
+            updateBoatAndWater();
+            
+            updateStatus();
+            updateCounters();
+        }
+        
+        // 更新船和水面的位置
+        function updateBoatAndWater() {
+            // 计算船的新位置
+            currentBoatTop = initialBoatTop + currentSinkAmount;
+            
+            // 计算水面的新位置（船下沉时，水面会上升相同的量）
+            currentWaterLevel = initialWaterLevel - currentSinkAmount;
+            
+            // 更新船的位置
+            boatContainer.style.top = `${currentBoatTop}%`;
+            
+            // 更新水面的位置和高度
+            waterSurface.style.top = `${currentWaterLevel}%`;
+            waterSurface.style.height = `${100 - currentWaterLevel}%`;
+            
+            // 更新水面上方的高度
+            waterAbove.style.height = `${currentWaterLevel}%`;
+            
+            // 如果水位线已标记，更新水位线位置
+            if (waterMarkAdded) {
+                updateWaterMarkPosition();
+            }
+            
+            updateCounters();
+            
+            // 检查水位线是否与水面重合
+            checkWaterLineAlignment();
+        }
+        
+        // 更新水位线位置
+        function updateWaterMarkPosition() {
+            if (!waterMarkAdded) return;
+            
+            // 水位线在船上的位置是固定的（标记时的位置）
+            boatWaterMark.style.top = `${waterMarkPosition}%`;
+        }
+        
+        // 检查水位线是否与水面重合
+        function checkWaterLineAlignment() {
+            if (!waterMarkAdded) return;
+            
+            // 获取水位线在页面中的绝对位置
+            const boatTop = parseFloat(boatContainer.style.top);
+            const waterMarkTopInPage = boatTop + waterMarkPosition;
+            
+            // 获取当前水面位置
+            const waterTop = parseFloat(waterSurface.style.top);
+            
+            // 如果水位线位置接近水面位置，说明重合
+            const difference = Math.abs(waterMarkTopInPage - waterTop);
+            
+            if (difference < 0.5 && stoneCount === totalStones && !successAnnounced) {
+                // 放置了6块石头，水位线与标记线重合，说明6块石头的重量等于大象的重量
+                speak('放置了6块石头，水位线与标记线重合，说明6块石头的重量等于大象的重量。实验成功！');
+                successAnnounced = true;
+            }
+        }
+        
+        // 开始标记水位线
+        function startMarkingWaterLevel() {
+            if (!elephantOnBoat) return;
+            
+            isMarkingMode = true;
+            markingHint.style.display = 'block';
+            boatContainer.style.cursor = 'crosshair';
+            
+            speak('点击船身标记水位线');
+            
+            markButton.disabled = true;
+            markButton.textContent = '正在标记...';
+        }
+        
+        // 船身点击事件 - 用于标记水位线
+        boatContainer.addEventListener('click', function(e) {
+            if (!isMarkingMode) return;
+            
+            // 防止点击石头时触发标记
+            if (e.target.classList.contains('stone-on-boat')) {
+                return;
+            }
+            
+            // 获取点击位置在船身上的相对位置
+            const rect = this.getBoundingClientRect();
+            const clickY = e.clientY - rect.top; // 点击位置距离船顶的距离
+            const relativePosition = (clickY / rect.height) * 100; // 转换为百分比
+            
+            // 确保水位线在船身上（10%到90%之间）
+            if (relativePosition < 10 || relativePosition > 90) {
+                speak('请点击船身中间区域标记');
+                return;
+            }
+            
+            // 标记水位线
+            waterMarkPosition = relativePosition;
+            boatWaterMark.style.top = `${waterMarkPosition}%`;
+            boatWaterMark.style.display = 'block';
+            waterMarkAdded = true;
+            
+            // 退出标记模式
+            isMarkingMode = false;
+            markingHint.style.display = 'none';
+            boatContainer.style.cursor = 'default';
+            
+            markButton.textContent = '水位线已标记';
+            
+            speak('水位线已标记');
+        });
+        
+        // 移除大象
+        function removeElephantFromBoat() {
+            if (!elephantOnBoat) return;
+            
+            // 显示右边的大象
+            elephantImg.style.opacity = '1';
+            elephantImg.style.cursor = 'grab';
+            
+            // 隐藏船上的大象
+            elephantOnBoatImg.style.display = 'none';
+            elephantOnBoat = false;
+            
+            // 船回到初始位置，但水位线保留
+            currentSinkAmount = 0;
+            updateBoatAndWater();
+            
+            speak('大象移除');
+            
+            removeElephantButton.disabled = true;
+            
+            updateCounters();
+        }
+        
+        // 更新状态
+        function updateStatus() {
+            // 当6块石头全部放上船时检查是否与大象下沉相同
+            if (stoneCount === totalStones) {
+                // 检查6块石头是否与大象下沉相同
+                const expectedSinkAmount = maxSinkAmount;
+                
+                if (Math.abs(currentSinkAmount - expectedSinkAmount) < 0.5) {
+                    // 这里不提示，只在checkWaterLineAlignment中提示
+                }
+            }
+        }
+        
+        // 更新计数器显示
+        function updateCounters() {
+            stoneCountElement.textContent = `${stoneCount}/${totalStones}`;
+            
+            // 计算下沉深度（模拟厘米）
+            const sinkDepthInCm = Math.round(currentSinkAmount);
+            sinkDepthElement.textContent = `下沉:${sinkDepthInCm}cm`;
+        }
+        
+        // 重置实验
+        function resetExperiment() {
+            elephantOnBoat = false;
+            waterMarkAdded = false;
+            stoneCount = 0;
+            stonesOnBoat = [];
+            isMarkingMode = false;
+            successAnnounced = false;
+            
+            // 重置状态
+            currentWaterLevel = initialWaterLevel;
+            currentBoatTop = initialBoatTop;
+            currentSinkAmount = 0;
+            waterMarkPosition = 0;
+            
+            // 重置DOM元素
+            elephantImg.style.opacity = '1';
+            elephantImg.style.cursor = 'grab';
+            elephantOnBoatImg.style.display = 'none';
+            boatWaterMark.style.display = 'none';
+            markingHint.style.display = 'none';
+            boatContainer.style.cursor = 'default';
+            
+            markButton.disabled = true;
+            markButton.textContent = '标记水位线';
+            removeElephantButton.disabled = true;
+            
+            // 重置船和水面的位置
+            updateBoatAndWater();
+            
+            speak('实验重置');
+            
+            stonesOnBoatContainer.innerHTML = '';
+            
+            const allStones = document.querySelectorAll('.stone');
+            allStones.forEach(stone => {
+                stone.style.opacity = '1';
+                stone.style.cursor = 'grab';
+            });
+            
+            updateCounters();
+        }
+        
+        // 事件监听
+        markButton.addEventListener('click', startMarkingWaterLevel);
+        removeElephantButton.addEventListener('click', removeElephantFromBoat);
+        resetButton.addEventListener('click', resetExperiment);
+        
+        // 为大象添加拖动事件
+        addDragEvents(elephantImg, 'elephant');
+        
+        // 初始化
+        window.addEventListener('DOMContentLoaded', function() {
+            createStones();
+            updateCounters();
+            
+            // 确保初始状态正确
+            updateBoatAndWater();
+            
+            // 语音提示初始说明
+            setTimeout(() => {
+                speak('将大象拖到船上');
+            }, 1000);
+            
+            document.addEventListener('click', function initSpeech() {
+                speechEnabled = true;
+                document.removeEventListener('click', initSpeech);
+            }, { once: true });
+            
+            // 添加图片加载失败时的备用方案
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                img.addEventListener('error', function() {
+                    if (this.alt.includes('船')) {
+                        this.style.display = 'none';
+                        const fallback = document.createElement('div');
+                        fallback.style.width = '100%';
+                        fallback.style.height = '100%';
+                        fallback.style.backgroundColor = '#8B4513';
+                        fallback.style.borderRadius = '10px 10px 50px 50px';
+                        fallback.style.position = 'relative';
+                        fallback.style.boxShadow = '0 10px 20px rgba(0,0,0,0.3)';
+                        fallback.innerHTML = '<div style="position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:10px;height:60px;background-color:#8B4513;"></div><div style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:60px;height:40px;background-color:#f0e68c;clip-path:polygon(50% 0%, 0% 100%, 100% 100%);"></div>';
+                        this.parentNode.insertBefore(fallback, this);
+                    } else if (this.alt.includes('大象')) {
+                        this.style.display = 'none';
+                        const fallback = document.createElement('div');
+                        fallback.style.width = this.classList.contains('elephant-on-boat') ? '100px' : '150px';
+                        fallback.style.height = this.classList.contains('elephant-on-boat') ? '80px' : '120px';
+                        fallback.style.backgroundColor = '#aaa';
+                        fallback.style.borderRadius = '40% 40% 20% 20%';
+                        fallback.style.display = 'flex';
+                        fallback.style.alignItems = 'center';
+                        fallback.style.justifyContent = 'center';
+                        fallback.style.fontSize = this.classList.contains('elephant-on-boat') ? '2rem' : '3rem';
+                        fallback.textContent = '🐘';
+                        this.parentNode.insertBefore(fallback, this);
+                    } else if (this.alt.includes('石头')) {
+                        this.style.display = 'none';
+                        const fallback = document.createElement('div');
+                        fallback.style.width = this.classList.contains('stone-on-boat') ? '50px' : '80px';
+                        fallback.style.height = this.classList.contains('stone-on-boat') ? '50px' : '80px';
+                        fallback.style.backgroundColor = '#777';
+                        fallback.style.borderRadius = '50%';
+                        fallback.style.display = 'flex';
+                        fallback.style.alignItems = 'center';
+                        fallback.style.justifyContent = 'center';
+                        fallback.style.fontSize = '1.5rem';
+                        fallback.textContent = '🪨';
+                        this.parentNode.insertBefore(fallback, this);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
